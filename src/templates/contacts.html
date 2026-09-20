@@ -10,7 +10,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Боковое меню (Sidebar) -->
+
         <div class="col-md-3 col-lg-2 bg-dark text-white p-3 min-vh-100 d-flex flex-column">
             <h5 class="mb-4">🏠 Меню</h5>
             <ul class="nav flex-column mb-auto">
@@ -43,21 +43,24 @@
             <div class="row g-5">
                 <!-- Левая колонка: Форма обратной связи -->
                 <div class="col-md-6">
-                    <form>
-                        <div class="mb-3">
-                            <label for="nameInput" class="form-label text-muted small">Имя</label>
-                            <input type="text" class="form-control" id="nameInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label text-muted small">Почта</label>
-                            <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="messageInput" class="form-label text-muted small">Сообщение</label>
-                            <textarea class="form-control" id="messageInput" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary px-4">Отправить</button>
-                    </form>
+                     <form method="POST" action="/contacts">
+                          <div class="mb-3">
+                              <label for="nameInput" class="form-label text-muted small">Имя</label>
+                              <!-- Добавлен атрибут name -->
+                              <input type="text" class="form-control" id="nameInput" name="username" required>
+                          </div>
+                          <div class="mb-3">
+                              <label for="emailInput" class="form-label text-muted small">Почта</label>
+                              <!-- Добавлен атрибут name -->
+                              <input type="email" class="form-control" id="emailInput" name="email" placeholder="name@example.com" required>
+                          </div>
+                          <div class="mb-4">
+                              <label for="messageInput" class="form-label text-muted small">Сообщение</label>
+                              <!-- Добавлен атрибут name -->
+                              <textarea class="form-control" id="messageInput" name="message" rows="4" required></textarea>
+                          </div>
+                          <button type="submit" class="btn btn-primary px-4">Отправить</button>
+                     </form>
                 </div>
 
                 <!-- Правая колонка: Информационный блок -->
