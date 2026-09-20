@@ -27,9 +27,18 @@
             </ul>
             <hr>
 
-            <div class="mt-auto">
-                <p class="mb-1 text-muted small">Профиль</p>
-                <strong>Пользователь</strong>
+            <div class="dropdown mt-auto">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="me-2">
+                        <p class="mb-0 text-muted small" style="line-height: 1;">Профиль</p>
+                        <strong>Пользователь</strong>
+                    </div>
+                </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
+                <li><a class="dropdown-item" href="#">Профиль</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#">Выход</a></li>
+            </ul>
             </div>
         </div>
 
@@ -101,6 +110,6 @@
         </div>
     </div>
 </div>
-
+<script src="/src/static/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
