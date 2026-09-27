@@ -7,15 +7,19 @@ def home_view(request):
 
 
 def contacts_view(request):
-    """Контроллер для отображения контактов и обработки POST-данных"""
+    """Контроллер для контактов с обработкой формы обратной связи"""
     context = {}
+
+
     if request.method == 'POST':
         name = request.POST.get('username')
         email = request.POST.get('email')
         message = request.POST.get('message')
 
-        # Печатаем принятые данные в консоль PyCharm
+
         print(f"\n[Обратная связь]: Имя: {name}, Email: {email}, Сообщение: {message}\n")
+
+
         context['success'] = True
 
     return render(request, 'contacts.html', context)
