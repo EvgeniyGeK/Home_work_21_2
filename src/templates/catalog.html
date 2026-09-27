@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог</title>
+
+    <link href="/src/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Боковое меню (Sidebar) -->
+        <div class="col-md-3 col-lg-2 bg-dark text-white p-3 min-vh-100 d-flex flex-column">
+            <h5 class="mb-4">Меню</h5>
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-white">🏠 Главная</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-white active bg-primary rounded">📁 Категории</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-white">📋 Заказы</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-white">📞 Контакты</a>
+                </li>
+            </ul>
+            <hr>
+            <!-- Сохраненное всплывающее окно пользователя -->
+            <div class="dropdown mt-auto">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="me-2">
+                        <p class="mb-0 text-muted small" style="line-height: 1;">Профиль</p>
+                        <strong>Пользователь</strong>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
+                    <li><a class="dropdown-item" href="#">Профиль</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#">Выход</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="col-md-9 col-lg-10 p-4 bg-light">
+            <h1 class="text-center display-4 my-4">Каталог</h1>
+            <p class="text-center text-muted mb-5">Вы находитесь на сайте, предназначенном для продажи товаров.</p>
+
+            <!-- Сетка: ровно 4 карточки на средних и больших экранах (row-cols-md-4) -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+
+                <!-- Карточка 1 -->
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span>Thumbnail</span>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <p class="card-text text-muted small mb-3">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span>Thumbnail</span>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <p class="card-text text-muted small mb-3">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span>Thumbnail</span>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <p class="card-text text-muted small mb-3">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 4 -->
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span>Thumbnail</span>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <p class="card-text text-muted small mb-3">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/src/static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
