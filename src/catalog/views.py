@@ -24,3 +24,13 @@ def contacts_view(request):
 
     return render(request, 'contacts.html', context)
 
+
+def catalog_view(request):
+    """Контроллер для страницы каталога (категорий)"""
+    return render(request, 'catalog.html')
+
+
+def orders_view(request):
+    """Контроллер для страницы заказов"""
+    return render(request, 'orders.html')
+
