@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная страница</title>
     <!-- Подключение Bootstrap -->
-    <link href="/src/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 </head>
 <body>
 
@@ -16,13 +17,13 @@
             <h5 class="mb-4">Меню</h5>
             <ul class="nav flex-column mb-auto">
                 <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white active bg-primary rounded">Категории</a>
+                    <a href="{% url 'catalog' %}" class="nav-link text-white">📁 Категории</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white">Заказы</a>
+                    <a href="{% url 'orders' %}" class="nav-link text-white">📋 Заказы</a>
                 </li>
                 <li class="nav-item mb-4">
-                    <a href="#" class="nav-link text-white">Контакты</a>
+                    <a href="{% url 'contacts' %}" class="nav-link text-white">📞 Контакты</a>
                 </li>
             </ul>
             <hr>
@@ -110,6 +111,6 @@
         </div>
     </div>
 </div>
-<script src="/src/static/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
