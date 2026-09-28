@@ -36,7 +36,7 @@ class Product(models.Model):
         help_text="Введите описание продукта"
     )
     image = models.ImageField(
-        upload_path="products/",
+        upload_to="products/",
         blank=True,
         null=True,
         verbose_name="Изображение",
@@ -51,7 +51,7 @@ class Product(models.Model):
         help_text="Выберите категорию продукта"
     )
     price = models.DecimalField(
-        max_length=10,
+        max_digits=10,
         decimal_places=2,
         verbose_name="Цена за покупку",
         help_text="Укажите цену продукта"
