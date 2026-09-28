@@ -74,3 +74,28 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} (Цена: {self.price})"
+
+
+class Contacts(models.Model):
+    phone = models.CharField(
+        max_length=50,
+        verbose_name="Телефон",
+        help_text="Укажите номер телефона"
+    )
+    email = models.EmailField(
+        verbose_name="Email",
+        help_text="Укажите контактную почту"
+    )
+    address = models.TextField(
+        verbose_name="Адрес",
+        help_text="Укажите физический адрес организации"
+    )
+
+    class Meta:
+        verbose_name = "Контактные данные"
+        verbose_name_plural = "Контактные данные"
+
+    def __str__(self):
+        return f"Контакты: {self.phone} | {self.email}"
+
+
