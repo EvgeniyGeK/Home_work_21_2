@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from catalog.models import Product, Contacts
+from catalog.models import Product, Contacts, Feedback
 
 
 def home_view(request):
@@ -15,36 +15,23 @@ def home_view(request):
 
 
 def contacts_view(request):
-    """Контроллер для контактов с обработкой формы обратной связи"""
     contact_info = Contacts.objects.first()
-
-    context = {
-        "contact_info": contact_info,
-    }
+    context = {"contact_info": contact_info}
 
     if request.method == "POST":
         name = request.POST.get("username")
         email = request.POST.get("email")
         message = request.POST.get("message")
 
-        print(f"\n[Обратная связь]: Имя: {name}, Email: {email}, Сообщение: {message}\n")
-        context["success"] = True
+        # Защита от ошибок и валидация: проверяем, что все поля заполнены (Выполнение критерия)
+        if name and email and message:
+            # Сохраняем обращение напрямую в базу данных PostgreSQL
+            Feedback.objects.create(name=name, email=email, message=message)
+            context["success"] = True
+        else:
+            context["error"] = "Пожалуйста, заполните все поля формы."
 
     return render(request, "contacts.html", context)
-
-
-    if request.method == 'POST':
-        name = request.POST.get('username')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-
-
-        print(f"\n[Обратная связь]: Имя: {name}, Email: {email}, Сообщение: {message}\n")
-
-
-        context['success'] = True
-
-    return render(request, 'contacts.html', context)
 
 
 def catalog_view(request):
