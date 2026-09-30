@@ -1,99 +1,51 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Контакты</title>
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
 
-<div class="container-fluid">
-    <div class="row">
+{% block title %}Контакты — Интернет-магазин{% endblock %}
 
-        <div class="col-md-3 col-lg-2 bg-dark text-white p-3 min-vh-100 d-flex flex-column">
-            <h5 class="mb-4">🏠 Меню</h5>
-            <ul class="nav flex-column mb-auto">
-                <li class="nav-item mb-2">
-                    <a href="{% url 'catalog:home' %}" class="nav-link text-white">🏠 Главная</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="{% url 'catalog:catalog' %}" class="nav-link text-white">📁 Категории</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="{% url 'catalog:orders' %}" class="nav-link text-white">📋 Заказы</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="{% url 'catalog:contacts' %}" class="nav-link text-white">📞 Контакты</a>
-                </li>
-            </ul>
-            <hr>
-            <!-- Меню профиля -->
-            <div class="dropdown mt-auto">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="me-2">
-                        <p class="mb-0 text-muted small" style="line-height: 1;">Профиль</p>
-                        <strong>Пользователь</strong>
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-                    <li><a class="dropdown-item" href="#">Профиль</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#">Выход</a></li>
-                </ul>
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">📞 Обратная связь</h1>
+
+    <div class="row g-5">
+        <!-- Левая колонка: Динамические контакты из админки -->
+        <div class="col-md-4">
+            <div class="bg-dark text-white p-4 rounded shadow-sm">
+                <h3 class="mb-4">Наши контакты</h3>
+                {% if contact_info %}
+                    <p class="mb-2"><strong>Телефон:</strong> {{ contact_info.phone }}</p>
+                    <p class="mb-2"><strong>Email:</strong> {{ contact_info.email }}</p>
+                    <p class="mb-0"><strong>Адрес:</strong> {{ contact_info.address }}</p>
+                {% else %}
+                    <p class="text-muted mb-0">Контактные данные не заполнены.</p>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Основной контент -->
-        <div class="col-md-9 col-lg-10 p-5 bg-white">
-            <h1 class="mb-5 display-5 text-center text-md-start">Контакты</h1>
-
-            <div class="row g-5">
-                <!-- Левая колонка: Форма обратной связи -->
-                <div class="col-md-6">
-                    {% if success %}
-                    <div class="alert alert-success" role="alert">
-                         Спасибо! Ваше сообщение успешно отправлено на сервер Django.
-                    </div>
-                    {% endif %}
-                     <form method="POST" action="/contacts/">
-                         {% csrf_token %}
-                          <div class="mb-3">
-                              <label for="nameInput" class="form-label text-muted small">Имя</label>
-                              <!-- Добавлен атрибут name -->
-                              <input type="text" class="form-control" id="nameInput" name="username" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="emailInput" class="form-label text-muted small">Почта</label>
-                              <!-- Добавлен атрибут name -->
-                              <input type="email" class="form-control" id="emailInput" name="email" placeholder="name@example.com" required>
-                          </div>
-                          <div class="mb-4">
-                              <label for="messageInput" class="form-label text-muted small">Сообщение</label>
-                              <!-- Добавлен атрибут name -->
-                              <textarea class="form-control" id="messageInput" name="message" rows="4" required></textarea>
-                          </div>
-                          <button type="submit" class="btn btn-primary px-4">Отправить</button>
-                     </form>
+        <!-- Правая колонка: Валидная форма с сохранением в БД -->
+        <div class="col-md-8">
+            {% if success %}
+                <div class="alert alert-success" role="alert">
+                    Спасибо! Ваше сообщение успешно отправлено и сохранено в базу данных.
                 </div>
+            {% endif %}
 
-                <!-- Правая колонка: Информационный блок -->
-                <div class="col-md-6">
-                    <h4 class="fw-bold mb-3">Наши контакты</h4>
-                    <p class="text-muted lh-lg small">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    </p>
-                    <p class="text-muted lh-lg small">
-                        While these feedback styles cannot be styled with CSS, you can still customize the feedback text through JavaScript.
-                    </p>
+            <form method="POST" action="{% url 'catalog:contacts' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Ваше имя</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Электронная почта</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Сообщение</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary px-4">Отправить обращение</button>
+            </form>
         </div>
-
     </div>
 </div>
-
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+{% endblock %}
