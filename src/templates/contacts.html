@@ -15,10 +15,18 @@
         <div class="col-md-3 col-lg-2 bg-dark text-white p-3 min-vh-100 d-flex flex-column">
             <h5 class="mb-4">🏠 Меню</h5>
             <ul class="nav flex-column mb-auto">
-                <li class="nav-item mb-2"><a href="/" class="nav-link text-white">Главная</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link text-white">Категории</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link text-white">Заказы</a></li>
-                <li class="nav-item mb-2"><a href="/contacts" class="nav-link text-white active bg-primary rounded">Контакты</a></li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'catalog:home' %}" class="nav-link text-white">🏠 Главная</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'catalog:catalog' %}" class="nav-link text-white">📁 Категории</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'catalog:orders' %}" class="nav-link text-white">📋 Заказы</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'catalog:contacts' %}" class="nav-link text-white">📞 Контакты</a>
+                </li>
             </ul>
             <hr>
             <!-- Меню профиля -->
