@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from catalog.models import Product, Contacts
 
 
@@ -56,3 +56,14 @@ def orders_view(request):
     """Контроллер для страницы заказов"""
     return render(request, 'orders.html')
 
+
+def product_detail_view(request, pk):
+    """
+    Контроллер для отображения детальной информации о товаре.
+    Получает pk из URL, извлекает объект через ORM и передает его в шаблон.
+    """
+    product = get_object_or_404(Product, pk=pk)
+    context = {
+        'product': product
+    }
+    return render(request, 'product_detail.html', context)
