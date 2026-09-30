@@ -4,14 +4,14 @@ from catalog.models import Product, Contacts, Feedback
 
 def home_view(request):
     """Контроллер для отображения домашней страницы"""
+    products = Product.objects.all()
     latest_products = Product.objects.order_by("-created_at")[:5]
-
     print("\n--- ПОСЛЕДНИЕ 5 СОЗДАННЫХ ПРОДУКТОВ ---")
     for index, product in enumerate(latest_products, start=1):
         print(f"{index}. {product.name} | Дата создания: {product.created_at}")
     print("---------------------------------------\n")
 
-    return render(request, "prototype_1.html")
+    return render(request, "prototype_1.html", {"object_list": products})
 
 
 def contacts_view(request):
