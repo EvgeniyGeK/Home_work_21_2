@@ -1,116 +1,75 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная страница</title>
-    <!-- Подключение Bootstrap -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
+{% extends 'base.html' %}
 
-<div class="container-fluid">
-    <div class="row">
+{% block title %}Главная страница — Список товаров{% endblock %}
 
-        <div class="col-md-3 col-lg-2 bg-dark text-white p-3 min-vh-100 d-flex flex-column">
-            <h5 class="mb-4">Меню</h5>
-            <ul class="nav flex-column mb-auto">
-                <li class="nav-item mb-2">
-                    <a href="{% url 'catalog' %}" class="nav-link text-white">📁 Категории</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="{% url 'orders' %}" class="nav-link text-white">📋 Заказы</a>
-                </li>
-                <li class="nav-item mb-4">
-                    <a href="{% url 'contacts' %}" class="nav-link text-white">📞 Контакты</a>
-                </li>
-            </ul>
-            <hr>
-
-            <div class="dropdown mt-auto">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="me-2">
-                        <p class="mb-0 text-muted small" style="line-height: 1;">Профиль</p>
-                        <strong>Пользователь</strong>
-                    </div>
-                </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-                <li><a class="dropdown-item" href="#">Профиль</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#">Выход</a></li>
-            </ul>
-            </div>
-        </div>
-
-
-        <div class="col-md-9 col-lg-10 p-4">
-            <h1 class="text-center my-4">Главная</h1>
-            <p class="text-center text-muted mb-5">Вы находитесь на сайте, предназначенном для продажи товаров.</p>
-
-
-            <div class="row justify-content-center g-4">
-
-                <div class="col-md-4 col-sm-6">
-                    <div class="card text-center h-100 shadow-sm">
-                        <div class="card-header py-3 bg-light">
-                            <h5 class="my-0 fw-normal">Товар 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="card-title pricing-card-title">$ 100</h2>
-                            <ul class="list-unstyled mt-3 mb-4 text-muted small">
-                                <li>10 users included</li>
-                                <li>2 GB of storage</li>
-                                <li>Email support</li>
-                                <li>Help center access</li>
-                            </ul>
-                            <button type="button" class="w-100 btn btn-outline-primary">Купить</button>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col-md-4 col-sm-6">
-                    <div class="card text-center h-100 shadow-sm">
-                        <div class="card-header py-3 bg-light">
-                            <h5 class="my-0 fw-normal">Товар 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="card-title pricing-card-title">$ 100</h2>
-                            <ul class="list-unstyled mt-3 mb-4 text-muted small">
-                                <li>10 users included</li>
-                                <li>2 GB of storage</li>
-                                <li>Email support</li>
-                                <li>Help center access</li>
-                            </ul>
-                            <button type="button" class="w-100 btn btn-outline-primary">Купить</button>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col-md-4 col-sm-6">
-                    <div class="card text-center h-100 shadow-sm">
-                        <div class="card-header py-3 bg-light">
-                            <h5 class="my-0 fw-normal">Товар 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="card-title pricing-card-title">$ 100</h2>
-                            <ul class="list-unstyled mt-3 mb-4 text-muted small">
-                                <li>10 users included</li>
-                                <li>2 GB of storage</li>
-                                <li>Email support</li>
-                                <li>Help center access</li>
-                            </ul>
-                            <button type="button" class="w-100 btn btn-outline-primary">Купить</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🏬 Каталог товаров</h1>
+    <span class="badge bg-secondary p-2">Всего позиций: {{ object_list|length }}</span>
 </div>
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for product in page_obj %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white text-center d-flex align-items-center justify-content-center" style="height: 220px;">
+                        <span class="small">Нет изображения</span>
+                    </div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-light text-dark border mb-2">{{ product.category.name }}</span>
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+
+                        <p class="card-text text-muted small">
+                            {{ product.description|truncatechars:100 }}
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-2">
+                        <strong class="text-success">{{ product.price }} руб.</strong>
+                        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-sm btn-primary px-3">Посмотреть</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted lead">В базе данных PostgreSQL пока нет доступных товаров.</p>
+        </div>
+    {% endfor %}
+</div>
+{% if page_obj.has_other_pages %}
+<nav aria-label="Навигация по страницам" class="mt-5">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-item" href="?page={{ page_obj.previous_page_number }}" class="page-link">Назад</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Назад</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-item" href="?page={{ num }}" class="page-link">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-item" href="?page={{ page_obj.next_page_number }}" class="page-link">Вперёд</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Вперёд</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

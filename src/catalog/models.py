@@ -98,4 +98,17 @@ class Contacts(models.Model):
     def __str__(self):
         return f"Контакты: {self.phone} | {self.email}"
 
+class Feedback(models.Model):
+    name = models.CharField(max_length=150, verbose_name="Имя пользователя")
+    email = models.EmailField(verbose_name="Email")
+    message = models.TextField(verbose_name="Сообщение")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата получения")
+
+    class Meta:
+        verbose_name = "Обратная связь"
+        verbose_name_plural = "Обращения"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Письмо от {self.name} ({self.email})"
 
