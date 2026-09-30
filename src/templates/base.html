@@ -14,7 +14,6 @@
         <!-- Подключаем созданный подшаблон меню -->
         {% include 'includes/inc_menu.html' %}
 
-        <!-- Основная динамическая область для контента других страниц -->
         <div class="col-md-9 col-lg-10 p-4">
             {% block content %}
             {% endblock %}
@@ -22,7 +21,6 @@
     </div>
 </div>
 
-<!-- Локальный JS-скрипт Bootstrap для плавного открытия всплывающего меню -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
