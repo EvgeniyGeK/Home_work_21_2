@@ -128,6 +128,12 @@ STATICFILES_DIRS = [
 ]
 
 
+# URL-адрес, по которому картинки будут запрашиваться в браузере
+MEDIA_URL = "/media/"
+
+# Физический путь на компьютере, куда Django будет складывать загруженные файлы
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
