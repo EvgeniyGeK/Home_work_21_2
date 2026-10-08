@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from blog.models import BlogPost
@@ -13,17 +14,33 @@ class BlogPostListView(ListView):
         return BlogPost.objects.filter(is_published=True)
 
 class BlogPostDetailView(DetailView):
-    """CBV для детального просмотра статьи с динамическим подсчетом просмотров"""
+    """CBV для детального просмотра статьи с динамическим подсчетом просмотров и уведомлением на почту"""
     model = BlogPost
     template_name = "blog/blogpost_detail.html"
     context_object_name = "post"
 
     def get_object(self, queryset=None):
-        """Переопределяем метод для увеличения счетчика просмотров при каждом клике"""
+        """Переопределяем метод для увеличения счетчика и отправки email при 100 просмотрах"""
         obj = super().get_object(queryset)
         obj.views_count += 1
         obj.save()
+
+
+        if obj.views_count == 100:
+            send_mail(
+                subject="Поздравляем! Статья достигла 100 просмотров! 🎉",
+                message=(
+                    f"Ваша статья '{obj.title}' пользуется большой популярностью "
+                    f"и только что набрала 100 просмотров на сайте.\n"
+                    f"Продолжайте в том же духе!"
+                ),
+                from_email=None,
+                recipient_list=["your-email@example.com"],
+                fail_silently=True,
+            )
+
         return obj
+
 
 class BlogPostCreateView(CreateView):
     """CBV для создания новой блоговой записи через веб-форму"""
