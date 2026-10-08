@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавление нового товара{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 700px;">
+    <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary mb-4">← Отмена</a>
+    
+    <div class="card shadow border-0 p-4">
+        <h2 class="mb-4">➕ Добавить новый товар</h2>
+        
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'catalog:product_create' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="name" class="form-label fw-bold">Наименование товара *</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="category" class="form-label fw-bold">Категория *</label>
+                <select class="form-select" id="category" name="category" required>
+                    <option value="" selected disabled>Выберите категорию...</option>
+                    {% for category in categories %}
+                        <option value="{{ category.pk }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label fw-bold">Цена за покупку (руб.) *</label>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label fw-bold">Описание товара</label>
+                <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="image" class="form-label fw-bold">Изображение товара</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Сохранить и опубликовать</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
