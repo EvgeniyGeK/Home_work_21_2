@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from catalog.models import Product, Contacts, Feedback
 
@@ -57,4 +57,12 @@ class ContactsView(View):
             context["error"] = "Пожалуйста, заполните все обязательные поля формы."
 
         return render(request, "contacts.html", context)
+
+class CatalogTemplateView(TemplateView):
+    """CBV для страницы категорий"""
+    template_name = "catalog.html"
+
+class OrdersTemplateView(TemplateView):
+    """CBV для страницы заказов"""
+    template_name = "orders.html"
 
