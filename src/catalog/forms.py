@@ -38,7 +38,7 @@ class ProductForm(forms.ModelForm):
             self.initial['category'] = self.instance.category.name
 
         for field_name, field in self.fields.items():
-            if field_name != 'category':  # Категорию мы уже настроили выше
+            if field_name != 'category':
                 if isinstance(field.widget, forms.CheckboxInput):
                     field.widget.attrs['class'] = 'form-check-input'
                 else:
