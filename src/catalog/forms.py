@@ -17,6 +17,16 @@ class ProductForm(forms.ModelForm):
             'class': 'form-control'
         })
     )
+    image = forms.ImageField(
+        label="Изображение товара",
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        error_messages={
+            'invalid_image': 'Ошибка: Неподдерживаемый формат файла или файл повреждён! Разрешено загружать только изображения (JPEG/PNG).',
+            'missing': 'Файл изображения отсутствует.',
+            'empty': 'Загруженный файл пуст.'
+        }
+    )
 
     class Meta:
         model = Product
@@ -79,3 +89,31 @@ class ProductForm(forms.ModelForm):
                     raise forms.ValidationError(f"Описание продукта содержит запрещенное спам-слово '{word}'.")
         return description
 
+    def clean_image(self):
+        """Валидация формата (JPEG/PNG) и размера (до 5 МБ) изображения продукта"""
+        image = self.cleaned_data.get("image")
+
+        if not image:
+            return image
+
+        max_size = 5 * 1024 * 1024  # 5 МБ
+        if image.size > max_size:
+            raise forms.ValidationError(
+                "Ошибка: Размер изображения превышает допустимый лимит 5 МБ. "
+                "Пожалуйста, сожмите картинку или выберите другой файл."
+            )
+
+        file_name = image.name.lower()
+        valid_extensions = ['.jpg', '.jpeg', '.png']
+
+        has_valid_extension = any(file_name.endswith(ext) for ext in valid_extensions)
+
+        valid_content_types = ['image/jpeg', 'image/png', 'image/pjpeg', 'image/x-png']
+
+        if not has_valid_extension or image.content_type not in valid_content_types:
+            raise forms.ValidationError(
+                "Ошибка: Неподдерживаемый формат файла! "
+                "Разрешено загружать изображения только в форматах JPEG (JPG) или PNG."
+            )
+
+        return image
