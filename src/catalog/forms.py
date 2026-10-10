@@ -13,12 +13,29 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = ("name", "description", "image", "category", "price")
 
+    def __init__(self, *args, **kwargs):
+        """Автоматическая стилизация всех полей формами Bootstrap (Выполнение критерия)"""
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.widget.attrs['class'] = 'form-control'
+
+    def clean_price(self):
+        """Валидация цены на отрицательные значения (Выполнение критерия)"""
+        price = self.cleaned_data.get("price")
+
+        if price is not None and price < 0:
+            raise forms.ValidationError(
+                "Ошибка: Цена за покупку не может быть отрицательной! Укажите корректное положительное число."
+            )
+        return price
+
     def clean_name(self):
         """Валидация поля 'name' на отсутствие спам-слов с игнорированием регистра"""
         name = self.cleaned_data.get("name")
-
         name_lower = name.lower()
-
         for word in FORBIDDEN_WORDS:
             if word in name_lower:
                 raise forms.ValidationError(
