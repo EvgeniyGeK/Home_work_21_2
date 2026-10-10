@@ -27,15 +27,15 @@
             </div>
 
             <div class="mb-3">
-                <label for="category" class="form-label fw-bold">Категория *</label>
-                <select class="form-select" id="category" name="category" required>
-                    <option value="" {% if not form.category.value %}selected{% endif %} disabled>Выберите категория...</option>
-                    {% for category in categories %}
-                        <option value="{{ category.pk }}" {% if form.category.value == category.pk %}selected{% endif %}>
-                            {{ category.name }}
-                        </option>
-                    {% endfor %}
-                </select>
+                <label for="category" class="form-label fw-bold">Категория товара *</label>
+                <input type="text"
+                       class="form-control"
+                       id="category"
+                       name="category"
+                       placeholder="{{ form.category.field.widget.attrs.placeholder }}"
+                       value="{{ form.category.value|default:'' }}"
+                       required>
+                <div class="form-text text-muted small">{{ form.category.help_text }}</div>
                 {% for error in form.category.errors %}
                     <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
                 {% endfor %}
