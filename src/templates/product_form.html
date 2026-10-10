@@ -7,45 +7,67 @@
     <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary mb-4">← Отмена</a>
     
     <div class="card shadow border-0 p-4">
-        <h2 class="mb-4">➕ Добавить новый товар</h2>
-        
-        {% if error %}
+        <h2 class="mb-4">➕ {% if object %}Редактировать товар{% else %}Добавить новый товар{% endif %}</h2>
+
+        {% if form.non_field_errors %}
             <div class="alert alert-danger" role="alert">
-                {{ error }}
+                {{ form.non_field_errors }}
             </div>
         {% endif %}
 
-        <form method="POST" action="{% url 'catalog:product_create' %}" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
             <div class="mb-3">
                 <label for="name" class="form-label fw-bold">Наименование товара *</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                <input type="text" class="form-control" id="name" name="name" value="{{ form.name.value|default:'' }}" required>
+                {% for error in form.name.errors %}
+                    <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
+                {% endfor %}
             </div>
-            
+
             <div class="mb-3">
-                <label for="category" class="form-label fw-bold">Категория *</label>
-                <select class="form-select" id="category" name="category" required>
-                    <option value="" selected disabled>Выберите категорию...</option>
-                    {% for category in categories %}
-                        <option value="{{ category.pk }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
+                <label for="category" class="form-label fw-bold">Категория товара *</label>
+                <input type="text"
+                       class="form-control"
+                       id="category"
+                       name="category"
+                       placeholder="{{ form.category.field.widget.attrs.placeholder }}"
+                       value="{{ form.category.value|default:'' }}"
+                       required>
+                <div class="form-text text-muted small">{{ form.category.help_text }}</div>
+                {% for error in form.category.errors %}
+                    <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="mb-3">
                 <label for="price" class="form-label fw-bold">Цена за покупку (руб.) *</label>
-                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ form.price.value|default:'' }}" required>
+                {% for error in form.price.errors %}
+                    <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="mb-3">
                 <label for="description" class="form-label fw-bold">Описание товара</label>
-                <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                <textarea class="form-control" id="description" name="description" rows="4">{{ form.description.value|default:'' }}</textarea>
+                {% for error in form.description.errors %}
+                    <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="mb-4">
                 <label for="image" class="form-label fw-bold">Изображение товара</label>
+                {% if form.instance.image %}
+                    <div class="mb-2">
+                        <small class="text-muted">Текущее изображение: {{ form.instance.image.name }}</small>
+                    </div>
+                {% endif %}
                 <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                {% for error in form.image.errors %}
+                <div class="text-danger small mt-1 fw-bold">⚠️ {{ error }}</div>
+                {% endfor %}
             </div>
 
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Сохранить и опубликовать</button>
