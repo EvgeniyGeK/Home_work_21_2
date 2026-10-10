@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление статьей{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <a href="{% url 'blog:list' %}" class="btn btn-outline-secondary mb-4">← Отмена</a>
+    
+    <div class="card border-0 shadow-sm p-4">
+        <h2>{% if object %}📝 Редактировать статью{% else %}➕ Создать новую статью{% endif %}</h2>
+        
+        <form method="POST" enctype="multipart/form-data" class="mt-4">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="id_title" class="form-label fw-bold">Заголовок</label>
+                <input type="text" name="title" class="form-control" id="id_title" value="{{ form.title.value|default:'' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_content" class="form-label fw-bold">Текст статьи</label>
+                <textarea name="content" class="form-control" id="id_content" rows="8" required>{{ form.content.value|default:'' }}</textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_preview" class="form-label fw-bold">Изображение (превью)</label>
+                <input type="file" name="preview" class="form-control" id="id_preview" accept="image/*">
+            </div>
+            
+            <div class="mb-4 form-check form-switch">
+                <input type="checkbox" name="is_published" class="form-check-input" id="id_is_published" {% if form.is_published.value or form.is_published.value is None %}checked{% endif %}>
+                <label class="form-check-label fw-bold" for="id_is_published">Опубликовать сразу</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

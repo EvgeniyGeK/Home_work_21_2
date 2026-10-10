@@ -1,0 +1,26 @@
+html
+{% extends 'base.html' %}
+
+{% block title %}Блог — {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <a href="{% url 'blog:list' %}" class="btn btn-outline-secondary mb-4">← Назад к статьям</a>
+
+    <div class="card border-0 shadow-sm p-4">
+        <h1 class="mb-2">{{ post.title }}</h1>
+        <div class="text-muted small mb-4 d-flex justify-content-between">
+            <span>📅 Опубликовано: {{ post.created_at|date:"d.m.Y H:i" }}</span>
+            <span>👁 Просмотров: {{ post.views_count }}</span>
+        </div>
+
+        {% if post.preview %}
+            <img src="{{ post.preview.url }}" class="img-fluid rounded mb-4 w-100" style="max-height: 450px; object-fit: cover;">
+        {% endif %}
+
+        <p class="lead text-dark" style="white-space: pre-line; line-height: 1.8;">
+            {{ post.content }}
+        </p>
+    </div>
+</div>
+{% endblock %}
