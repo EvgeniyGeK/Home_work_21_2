@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from blog.models import BlogPost
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class BlogPostListView(ListView):
     """CBV для вывода списка всех опубликованных статей"""
@@ -42,14 +43,14 @@ class BlogPostDetailView(DetailView):
         return obj
 
 
-class BlogPostCreateView(CreateView):
+class BlogPostCreateView(LoginRequiredMixin, CreateView):
     """CBV для создания новой блоговой записи через веб-форму"""
     model = BlogPost
     template_name = "blog/blogpost_form.html"
     fields = ("title", "content", "preview", "is_published")
     success_url = reverse_lazy("blog:list")
 
-class BlogPostUpdateView(UpdateView):
+class BlogPostUpdateView(LoginRequiredMixin, UpdateView):
     """CBV для редактирования существующей блоговой записи"""
     model = BlogPost
     template_name = "blog/blogpost_form.html"
@@ -59,7 +60,7 @@ class BlogPostUpdateView(UpdateView):
         """После редактирования возвращаем пользователя на детальную страницу статьи"""
         return reverse("blog:detail", kwargs={"pk": self.object.pk})
 
-class BlogPostDeleteView(DeleteView):
+class BlogPostDeleteView(LoginRequiredMixin, DeleteView):
     """CBV для удаления статьи с подтверждением"""
     model = BlogPost
     template_name = "blog/blogpost_confirm_delete.html"
