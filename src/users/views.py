@@ -3,6 +3,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.views.generic import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
+
 
 from config import settings
 from users.forms import UserLoginForm, UserRegisterForm
@@ -50,3 +54,13 @@ class UserLoginView(LoginView):
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy("catalog:home")
 
+
+class UserProfileView(LoginRequiredMixin, UpdateView):
+    User = get_user_model()
+    model = User
+    form_class = UserRegisterForm
+    template_name = 'users/profile.html'
+    success_url = reverse_lazy('catalog:home')
+
+    def get_object(self, queryset=None):
+        return self.request.user

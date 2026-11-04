@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Авторизация</h3>
+
+                    {# Вывод ошибок неправильного логина/пароля #}
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Неверный Email или пароль. Пожалуйста, проверьте данные.
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary w-100 mt-2">Войти</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'users:register' %}" class="small text-muted">Создать аккаунт</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

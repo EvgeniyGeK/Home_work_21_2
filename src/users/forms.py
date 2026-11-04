@@ -7,23 +7,23 @@ User = get_user_model()
 
 
 class UserRegisterForm(UserCreationForm):
-    # Дополнительное поле подтверждения пароля (уже встроено в UserCreationForm,
-    # но явно добавим/кастомизируем для уверенности в критериях)
-    password_confirm = forms.CharField(
-        label="Подтвердите пароль",
-        widget=forms.PasswordInput(attrs={"class": "form-control"}),
-    )
+
 
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("email", "phone", "country", "avatar")
 
+
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         # Автоматическая стилизация полей под Bootstrap
         for field_name, field in self.fields.items():
             if not isinstance(field.widget, forms.CheckboxInput):
-                field.widget.attrs["class"] = "form-control"
+                field.widget.attrs['class'] = 'form-control'
+
+
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
@@ -54,4 +54,8 @@ class UserLoginForm(AuthenticationForm):
         ] = "email@example.com"
         for field_name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
+
+
+
+
 
