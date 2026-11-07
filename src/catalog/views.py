@@ -40,6 +40,8 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         product.save()
         return super().form_valid(form)
 
+
+
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     """CBV для редактирования существующего товара с использованием ProductForm"""
     model = Product
@@ -49,10 +51,17 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # Проверяем: если текущий пользователь — владелец ИЛИ имеет права модератора
-        if self.object.owner == request.user or request.user.has_perm('catalog.can_change_description'):
+
+        # 2. Проверяем три условия допуска:
+        # - Текущий пользователь — хозяин этого товара
+        # - ИЛИ текущий пользователь — главный администратор (суперюзер)
+        # - ИЛИ у пользователя есть кастомное право модератора
+        if self.object.owner == request.user or request.user.is_superuser or request.user.has_perm(
+                'catalog.can_change_description'):
+            # Если хоть одно условие совпало — разрешаем открыть страницу формы
             return super().dispatch(request, *args, **kwargs)
-        # Если не владелец и не модератор — выкидываем ошибку 403 Forbidden
+
+        # 3. Если зашел чужой человек или бот — жестко блокируем и отдаем ошибку 403
         raise PermissionDenied
 
 

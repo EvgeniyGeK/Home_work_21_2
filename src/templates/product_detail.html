@@ -31,15 +31,15 @@
                 </div>
                 <div class="mt-4 d-flex gap-2">
                         {# Кнопка редактирования доступна владельцу или модератору с кастомным правом #}
-                        {% if user.is_authenticated and product.owner == user or perms.catalog.can_change_description %}
-                            <a href="{% url 'catalog:update_product' product.pk %}" class="btn btn-warning">
+                        {% if user.is_authenticated and object.owner == user or perms.catalog.can_change_description %}
+                            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">
                                 ✏️ Редактировать продукт
                             </a>
                         {% endif %}
 
                         {# Кнопку удаления по критериям видит только создатель (или суперпользователь) #}
-                        {% if user.is_authenticated and product.owner == user or user.is_superuser %}
-                            <a href="{% url 'catalog:delete_product' product.pk %}" class="btn btn-danger">
+                        {% if user.is_authenticated and object.owner == user or user.is_superuser %}
+                            <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">
                                 🗑️ Удалить продукт
                             </a>
                         {% endif %}
