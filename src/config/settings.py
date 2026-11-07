@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'catalog',
     'blog',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -123,11 +124,13 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    }
-}
 
 DEFAULT_FROM_EMAIL = "shop-admin@example.com"
+
+
+AUTH_USER_MODEL = 'users.User'
+
+
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'catalog:home'
 

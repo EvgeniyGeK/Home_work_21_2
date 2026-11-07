@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Удаление товара{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5" style="max-width: 500px;">
+    <div class="card border-0 shadow-sm p-5">
+        <h2 class="text-danger mb-4">Удаление товара</h2>
+        <p class="lead mb-4">
+            Удалить товар <strong>«{{ object.name }}»</strong>?
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Да, удалить</button>
+            <a href="{% url 'catalog:home' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
