@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 from catalog.models import Product, Contacts, Feedback
 from catalog.forms import ProductForm
@@ -17,7 +18,7 @@ class ProductListView(ListView):
 
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     """CBV для детальной страницы конкретного товара по его ID (pk)"""
     model = Product
     template_name = "product_detail.html"
@@ -31,6 +32,16 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     template_name = "product_form.html"
     success_url = reverse_lazy("catalog:home")
 
+    def form_valid(self, form):
+        # Перехватываем объект, но еще не сохраняем в БД
+        product = form.save(commit=False)
+        # Автоматически назначаем владельцем текущего пользователя
+        product.owner = self.request.user
+        product.save()
+        return super().form_valid(form)
+
+
+
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     """CBV для редактирования существующего товара с использованием ProductForm"""
     model = Product
@@ -38,14 +49,37 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "product_form.html"
     success_url = reverse_lazy("catalog:home")
 
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # 2. Проверяем три условия допуска:
+        # - Текущий пользователь — хозяин этого товара
+        # - ИЛИ текущий пользователь — главный администратор (суперюзер)
+        # - ИЛИ у пользователя есть кастомное право модератора
+        if self.object.owner == request.user or request.user.is_superuser or request.user.has_perm(
+                'catalog.can_change_description'):
+            # Если хоть одно условие совпало — разрешаем открыть страницу формы
+            return super().dispatch(request, *args, **kwargs)
+
+        # 3. Если зашел чужой человек или бот — жестко блокируем и отдаем ошибку 403
+        raise PermissionDenied
+
+
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     """CBV для безопасного удаления товара из базы данных"""
     model = Product
     template_name = "blog/blogpost_confirm_delete.html"
     success_url = reverse_lazy("catalog:home")
 
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # Удалять чужой товар модератор обычно не может, только автор (или суперпользователь)
+        if self.object.owner == request.user or request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied
 
-class ContactsView(View):
+
+class ContactsView(LoginRequiredMixin, View):
     """CBV для страницы контактов с выводом данных и ручной валидацией POST-формы"""
 
     def get(self, request, *args, **kwargs):
@@ -71,11 +105,11 @@ class ContactsView(View):
 
         return render(request, "contacts.html", context)
 
-class CatalogTemplateView(TemplateView):
+class CatalogTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы категорий"""
     template_name = "catalog.html"
 
-class OrdersTemplateView(TemplateView):
+class OrdersTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы заказов"""
     template_name = "orders.html"
 

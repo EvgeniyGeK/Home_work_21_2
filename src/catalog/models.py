@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -71,6 +72,25 @@ class Product(models.Model):
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
         ordering = ["-created_at"]
+        permissions = [
+            ("can_cancel_publication", "Can cancel publication of product"),
+            ("can_change_description", "Can change description of product"),
+            ("can_change_category", "Can change category of product"),
+        ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name="Владелец",
+        blank=True,
+        null=True
+    )
+
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name="Признак публикации"
+    )
+
 
     def __str__(self):
         return f"{self.name} (Цена: {self.price})"

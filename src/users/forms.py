@@ -56,6 +56,16 @@ class UserLoginForm(AuthenticationForm):
             field.widget.attrs["class"] = "form-control"
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("email", "phone", "country", "avatar")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Сохраняем стилизацию Bootstrap для полей редактирования профиля
+        for field_name, field in self.fields.items():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs['class'] = 'form-control'
 
 
