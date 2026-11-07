@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 from catalog.models import Product, Contacts, Feedback
 from catalog.forms import ProductForm
@@ -46,11 +47,27 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "product_form.html"
     success_url = reverse_lazy("catalog:home")
 
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # Проверяем: если текущий пользователь — владелец ИЛИ имеет права модератора
+        if self.object.owner == request.user or request.user.has_perm('catalog.can_change_description'):
+            return super().dispatch(request, *args, **kwargs)
+        # Если не владелец и не модератор — выкидываем ошибку 403 Forbidden
+        raise PermissionDenied
+
+
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     """CBV для безопасного удаления товара из базы данных"""
     model = Product
     template_name = "blog/blogpost_confirm_delete.html"
     success_url = reverse_lazy("catalog:home")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # Удалять чужой товар модератор обычно не может, только автор (или суперпользователь)
+        if self.object.owner == request.user or request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied
 
 
 class ContactsView(LoginRequiredMixin, View):
