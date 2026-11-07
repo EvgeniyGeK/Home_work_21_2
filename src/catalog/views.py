@@ -31,6 +31,14 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     template_name = "product_form.html"
     success_url = reverse_lazy("catalog:home")
 
+    def form_valid(self, form):
+        # Перехватываем объект, но еще не сохраняем в БД
+        product = form.save(commit=False)
+        # Автоматически назначаем владельцем текущего пользователя
+        product.owner = self.request.user
+        product.save()
+        return super().form_valid(form)
+
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     """CBV для редактирования существующего товара с использованием ProductForm"""
     model = Product
