@@ -29,6 +29,21 @@
                         {{ product.description|default:"Описание для данного товара отсутствует." }}
                     </p>
                 </div>
+                <div class="mt-4 d-flex gap-2">
+                        {# Кнопка редактирования доступна владельцу или модератору с кастомным правом #}
+                        {% if user.is_authenticated and product.owner == user or perms.catalog.can_change_description %}
+                            <a href="{% url 'catalog:update_product' product.pk %}" class="btn btn-warning">
+                                ✏️ Редактировать продукт
+                            </a>
+                        {% endif %}
+
+                        {# Кнопку удаления по критериям видит только создатель (или суперпользователь) #}
+                        {% if user.is_authenticated and product.owner == user or user.is_superuser %}
+                            <a href="{% url 'catalog:delete_product' product.pk %}" class="btn btn-danger">
+                                🗑️ Удалить продукт
+                            </a>
+                        {% endif %}
+                    </div>
 
                 <div class="border-top pt-3 text-muted small">
                     <p class="mb-1"><strong>Идентификатор (ID):</strong> {{ product.pk }}</p>
