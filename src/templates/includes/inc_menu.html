@@ -31,6 +31,9 @@
                 <span class="nav-link text-success fw-bold">👤 {{ user.email }}</span>
             </li>
             <li class="nav-item mb-2">
+                <a href="{% url 'users:profile' %}" class="nav-link text-white">⚙️ Настройки профиля</a>
+            </li>
+            <li class="nav-item mb-2">
                 <form method="post" action="{% url 'users:logout' %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-link nav-link text-danger p-0" style="text-decoration: none;">🚪 Выйти</button>
@@ -43,9 +46,7 @@
             <li class="nav-item mb-2">
                 <a href="{% url 'users:register' %}" class="nav-link text-white">📝 Регистрация</a>
             </li>
-            <li class="nav-item mb-2">
-                <a href="{% url 'users:profile' %}" class="nav-link text-white">⚙️ Настройки профиля</a>
-            </li>
+
         {% endif %}
     </ul>
 </div>

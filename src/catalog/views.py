@@ -17,7 +17,7 @@ class ProductListView(ListView):
 
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     """CBV для детальной страницы конкретного товара по его ID (pk)"""
     model = Product
     template_name = "product_detail.html"
@@ -45,7 +45,7 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("catalog:home")
 
 
-class ContactsView(View):
+class ContactsView(LoginRequiredMixin, View):
     """CBV для страницы контактов с выводом данных и ручной валидацией POST-формы"""
 
     def get(self, request, *args, **kwargs):
@@ -71,11 +71,11 @@ class ContactsView(View):
 
         return render(request, "contacts.html", context)
 
-class CatalogTemplateView(TemplateView):
+class CatalogTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы категорий"""
     template_name = "catalog.html"
 
-class OrdersTemplateView(TemplateView):
+class OrdersTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы заказов"""
     template_name = "orders.html"
 

@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 
 from config import settings
-from users.forms import UserLoginForm, UserRegisterForm
+from users.forms import UserLoginForm, UserRegisterForm, UserProfileForm
 
 
 class UserRegisterView(CreateView):
@@ -58,7 +58,7 @@ class UserLogoutView(LogoutView):
 class UserProfileView(LoginRequiredMixin, UpdateView):
     User = get_user_model()
     model = User
-    form_class = UserRegisterForm
+    form_class = UserProfileForm
     template_name = 'users/profile.html'
     success_url = reverse_lazy('catalog:home')
 
