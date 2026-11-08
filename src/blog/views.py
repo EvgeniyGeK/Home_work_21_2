@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from blog.models import BlogPost
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class BlogPostListView(ListView):
+class BlogPostListView(LoginRequiredMixin, ListView):
     """CBV для вывода списка всех опубликованных статей"""
     model = BlogPost
     template_name = "blog/blogpost_list.html"
@@ -14,7 +14,7 @@ class BlogPostListView(ListView):
         """Выводим только те статьи, у которых стоит признак публикации"""
         return BlogPost.objects.filter(is_published=True)
 
-class BlogPostDetailView(DetailView):
+class BlogPostDetailView(LoginRequiredMixin, DetailView):
     """CBV для детального просмотра статьи с динамическим подсчетом просмотров и уведомлением на почту"""
     model = BlogPost
     template_name = "blog/blogpost_detail.html"
