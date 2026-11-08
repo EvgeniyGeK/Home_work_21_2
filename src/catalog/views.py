@@ -8,6 +8,9 @@ from django.core.exceptions import PermissionDenied
 
 from catalog.models import Product, Contacts, Feedback
 from catalog.forms import ProductForm
+from django.core.cache import cache
+from catalog.services import get_products_by_category
+from catalog.models import Category
 
 
 
@@ -17,6 +20,18 @@ class ProductListView(ListView):
     template_name = "prototype_1.html"
     context_object_name = "page_obj"
     paginate_by = 3
+
+    def get_queryset(self):
+        # 1. Уникальный ключ для хранения общего списка продуктов в Redis
+        key = 'all_published_products'
+        # 2. Пытаемся достать данные из кеша
+        products = cache.get(key)
+        # 3. Если в Redis пусто — забираем из базы данных и сохраняем в кеш на 15 минут (900 секунд)
+        if products is None:
+            products = list(Product.objects.filter(is_published=True).order_by('-created_at'))
+            cache.set(key, products, timeout=900)
+
+        return products
 
 
 
@@ -120,3 +135,19 @@ class ProductUnpublishView(LoginRequiredMixin, View):
 
         # 3. Если права нет — выкидываем ошибку доступа
         raise PermissionDenied
+
+
+class CategoryProductsListView(ListView):
+    model = Product
+    template_name = 'catalog/category_products.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        # Используем нашу сервисную функцию
+        return get_products_by_category(self.kwargs['category_id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = Category.objects.get(pk=self.kwargs['category_id'])
+        return context
+
