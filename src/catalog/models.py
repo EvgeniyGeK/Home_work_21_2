@@ -73,6 +73,7 @@ class Product(models.Model):
         verbose_name_plural = "Продукты"
         ordering = ["-created_at"]
         permissions = [
+            ("can_unpublish_product", "Can_unpublish_product"),
             ("can_cancel_publication", "Can cancel publication of product"),
             ("can_change_description", "Can change description of product"),
             ("can_change_category", "Can change category of product"),
