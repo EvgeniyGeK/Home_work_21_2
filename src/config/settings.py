@@ -134,6 +134,8 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'catalog:home'
 
+CACHE_ENABLED = True
+
 # Настройки кеширования через Redis
 CACHES = {
     "default": {
