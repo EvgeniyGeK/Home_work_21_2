@@ -41,6 +41,23 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
     template_name = "product_detail.html"
     context_object_name = "product"
 
+    def get_object(self, queryset=None):
+        # Получаем базовый ID продукта
+        obj_pk = self.kwargs.get(self.pk_url_kwarg)
+
+        # Формируем УНИКАЛЬНЫЙ ключ кеша, включающий ID текущего пользователя!
+        cache_key = f'product_detail_{obj_pk}_user_{self.request.user.id}'
+
+        # Пытаемся достать объект из кеша
+        obj = cache.get(cache_key)
+
+        if obj is None:
+            # Если в Redis пусто — вычитываем из базы данных и сохраняем на 15 минут
+            obj = super().get_object(queryset)
+            cache.set(cache_key, obj, timeout=900)
+
+        return obj
+
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
     """CBV для создания нового товара через форму на сайте"""

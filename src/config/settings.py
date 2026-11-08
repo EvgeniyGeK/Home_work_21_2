@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,12 +135,20 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'catalog:home'
 
+if 'test' in sys.argv:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379",
+        }
+    }
+
 CACHE_ENABLED = True
 
-# Настройки кеширования через Redis
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
-    }
-}
+

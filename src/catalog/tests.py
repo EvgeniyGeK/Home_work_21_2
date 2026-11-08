@@ -5,6 +5,8 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from catalog.models import Product, Category
 from django.utils.crypto import get_random_string
+from django.core.cache import cache
+from catalog.services import get_products_by_category
 
 User = get_user_model()
 
@@ -124,3 +126,70 @@ class ProductAccessRightsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.update_url)
         self.assertNotContains(response, self.delete_url)
+
+
+class CachingAndServicesTestCase(TestCase):
+
+    def setUp(self):
+        # Очищаем кеш перед каждым тестом, чтобы исключить влияние прошлых запусков
+        cache.clear()
+
+        # Создаем тестового пользователя для прохождения LoginRequiredMixin
+        self.user = User.objects.create(email='test_cache@test.com')
+        self.user.set_password('password123')
+        self.user.save()
+
+        # Создаем тестовую категорию и продукты
+        self.category = Category.objects.create(name='Электроника', description='Гаджеты')
+        self.product = Product.objects.create(
+            name='Смартфон',
+            description='Флагман',
+            price=500,
+            category=self.category,
+            is_published=True
+        )
+
+        # URL-адреса страниц
+        self.home_url = reverse('catalog:home')
+        self.category_url = reverse('catalog:category_products', kwargs={'category_id': self.category.pk})
+
+    def test_service_returns_products_and_caches_them(self):
+        """Сервисная функция возвращает продукты из категории и записывает их в кеш"""
+        # 1. Проверяем, что изначально в кеше по ключу категории ничего нет
+        cache_key = f'products_category_{self.category.pk}'
+        self.assertIsNone(cache.get(cache_key))
+
+        # 2. Вызываем сервисную функцию (она должна сходить в БД)
+        products = get_products_by_category(self.category.pk)
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].name, 'Смартфон')
+
+        # 3. Проверяем, что после вызова функции данные успешно записались в кеш Redis
+        cached_products = cache.get(cache_key)
+        self.assertIsNotNone(cached_products)
+        self.assertEqual(cached_products[0].name, 'Смартфон')
+
+    def test_product_list_low_level_caching(self):
+        """Контроллер главной страницы использует низкоуровневый кеш для списка товаров"""
+        self.client.login(email='test_cache@test.com', password='password123')
+
+        # 1. Проверяем, что ключ общего списка в кеше пуст
+        cache_key = 'all_published_products'
+        self.assertIsNone(cache.get(cache_key))
+
+        # 2. Делаем запрос к главной странице (контроллер должен прописать кеш)
+        response = self.client.get(self.home_url)
+        self.assertEqual(response.status_code, 200)
+
+        # 3. Убеждаемся, что список продуктов теперь хранится в кеше
+        cached_products = cache.get(cache_key)
+        self.assertIsNotNone(cached_products)
+        self.assertEqual(cached_products[0].name, 'Смартфон')
+
+    def test_category_products_view_status_code(self):
+        """Новое представление списка продуктов категории возвращает статус 200 для авторизованного юзера"""
+        self.client.login(email='test_cache@test.com', password='password123')
+
+        response = self.client.get(self.category_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Смартфон')
