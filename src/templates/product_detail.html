@@ -22,7 +22,7 @@
                 <div>
                     <span class="badge bg-primary mb-2">{{ product.category.name }}</span>
                     <h1 class="display-5 mb-3">{{ product.name }}</h1>
-                    <h3 class="text-success mb-4">{{ product.price }} руб.</h3>
+                    <h3 class="text-success mb-4">{{product.price}} руб.</h3>
                     
                     <h5 class="text-muted">Описание товара:</h5>
                     <p class="lead text-dark bg-light p-3 rounded" style="white-space: pre-line;">
@@ -36,6 +36,14 @@
                                 ✏️ Редактировать продукт
                             </a>
                         {% endif %}
+                        {% if object.is_published and perms.catalog.can_cancel_publication or user.is_superuser %}
+                            <form method="post" action="{% url 'catalog:product_unpublish' object.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-dark">
+                                    🛑 Снять с публикации
+                                </button>
+                            </form>
+                        {% endif %}
 
                         {# Кнопку удаления по критериям видит только создатель (или суперпользователь) #}
                         {% if user.is_authenticated and object.owner == user or user.is_superuser %}
@@ -46,9 +54,9 @@
                     </div>
 
                 <div class="border-top pt-3 text-muted small">
-                    <p class="mb-1"><strong>Идентификатор (ID):</strong> {{ product.pk }}</p>
-                    <p class="mb-1"><strong>Дата добавления:</strong> {{ product.created_at|date:"d.m.Y H:i" }}</p>
-                    <p class="mb-0"><strong>Последнее обновление:</strong> {{ product.updated_at|date:"d.m.Y H:i" }}</p>
+                    <p class="mb-1"><strong>Идентификатор (ID):</strong> {{product.pk}}</p>
+                    <p class="mb-1"><strong>Дата добавления:</strong> {{product.created_at|date:"d.m.Y H:i" }}</p>
+                    <p class="mb-0"><strong>Последнее обновление:</strong> {{product.updated_at|date:"d.m.Y H:i" }}</p>
                 </div>
             </div>
         </div>

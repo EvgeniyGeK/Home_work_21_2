@@ -1,12 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 
 from catalog.models import Product, Contacts, Feedback
 from catalog.forms import ProductForm
+from django.core.cache import cache
+from catalog.services import get_products_by_category
+from catalog.models import Category
+
 
 
 class ProductListView(ListView):
@@ -16,6 +21,18 @@ class ProductListView(ListView):
     context_object_name = "page_obj"
     paginate_by = 3
 
+    def get_queryset(self):
+        # 1. Уникальный ключ для хранения общего списка продуктов в Redis
+        key = 'all_published_products'
+        # 2. Пытаемся достать данные из кеша
+        products = cache.get(key)
+        # 3. Если в Redis пусто — забираем из базы данных и сохраняем в кеш на 15 минут (900 секунд)
+        if products is None:
+            products = list(Product.objects.filter(is_published=True).order_by('-created_at'))
+            cache.set(key, products, timeout=900)
+
+        return products
+
 
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
@@ -23,6 +40,23 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = "product_detail.html"
     context_object_name = "product"
+
+    def get_object(self, queryset=None):
+        # Получаем базовый ID продукта
+        obj_pk = self.kwargs.get(self.pk_url_kwarg)
+
+        # Формируем УНИКАЛЬНЫЙ ключ кеша, включающий ID текущего пользователя!
+        cache_key = f'product_detail_{obj_pk}_user_{self.request.user.id}'
+
+        # Пытаемся достать объект из кеша
+        obj = cache.get(cache_key)
+
+        if obj is None:
+            # Если в Redis пусто — вычитываем из базы данных и сохраняем на 15 минут
+            obj = super().get_object(queryset)
+            cache.set(cache_key, obj, timeout=900)
+
+        return obj
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
@@ -33,13 +67,17 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("catalog:home")
 
     def form_valid(self, form):
-        # Перехватываем объект, но еще не сохраняем в БД
-        product = form.save(commit=False)
-        # Автоматически назначаем владельцем текущего пользователя
-        product.owner = self.request.user
-        product.save()
+        # 1. Привязываем текущего пользователя к полю owner формы, не сохраняя в БД
+        form.instance.owner = self.request.user
         return super().form_valid(form)
 
+def can_manage_product(user, product):
+    is_owner = product.owner_id == user.id
+    is_moderator = (
+        user.has_perm("catalog.can_change_description")
+        or user.has_perm("catalog.can_unpublish_product")
+    )
+    return is_owner or is_moderator or user.is_superuser
 
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
@@ -49,20 +87,13 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "product_form.html"
     success_url = reverse_lazy("catalog:home")
 
+
+
     def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        # 2. Проверяем три условия допуска:
-        # - Текущий пользователь — хозяин этого товара
-        # - ИЛИ текущий пользователь — главный администратор (суперюзер)
-        # - ИЛИ у пользователя есть кастомное право модератора
-        if self.object.owner == request.user or request.user.is_superuser or request.user.has_perm(
-                'catalog.can_change_description'):
-            # Если хоть одно условие совпало — разрешаем открыть страницу формы
-            return super().dispatch(request, *args, **kwargs)
-
-        # 3. Если зашел чужой человек или бот — жестко блокируем и отдаем ошибку 403
-        raise PermissionDenied
+        product = self.get_object()
+        if not can_manage_product(request.user, product):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
@@ -72,11 +103,10 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("catalog:home")
 
     def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        # Удалять чужой товар модератор обычно не может, только автор (или суперпользователь)
-        if self.object.owner == request.user or request.user.is_superuser:
-            return super().dispatch(request, *args, **kwargs)
-        raise PermissionDenied
+        product = self.get_object()
+        if not can_manage_product(request.user, product):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ContactsView(LoginRequiredMixin, View):
@@ -87,23 +117,16 @@ class ContactsView(LoginRequiredMixin, View):
         contact_info = Contacts.objects.first()
         return render(request, "contacts.html", {"contact_info": contact_info})
 
-    def post(self, request, *args, **kwargs):
-        """Обработка POST-запроса: валидация, сохранение обращения и вывод алерта"""
-        contact_info = Contacts.objects.first()
-        name = request.POST.get("username")
-        email = request.POST.get("email")
-        message = request.POST.get("message")
+    def post(self, request, pk, *args, **kwargs):
+        product = get_object_or_404(Product, pk=pk)
 
-        context = {"contact_info": contact_info}
+        # Используем единую функцию проверки прав
+        if can_manage_product(request.user, product):
+            product.is_published = False
+            product.save()
+            return redirect("catalog:product_detail", pk=pk)
 
-
-        if name and email and message:
-            Feedback.objects.create(name=name, email=email, message=message)
-            context["success"] = True
-        else:
-            context["error"] = "Пожалуйста, заполните все обязательные поля формы."
-
-        return render(request, "contacts.html", context)
+        raise PermissionDenied
 
 class CatalogTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы категорий"""
@@ -112,4 +135,36 @@ class CatalogTemplateView(LoginRequiredMixin, TemplateView):
 class OrdersTemplateView(LoginRequiredMixin, TemplateView):
     """CBV для страницы заказов"""
     template_name = "orders.html"
+
+
+class ProductUnpublishView(LoginRequiredMixin, View):
+    """Контроллер для снятия продукта с публикации модератором"""
+
+    def post(self, request, pk, *args, **kwargs):
+        # 1. Извлекаем продукт по его id
+        product = get_object_or_404(Product, pk=pk)
+
+        # 2. Проверяем наличие конкретного права модератора
+        if request.user.has_perm("can_unpublish_product"):
+            product.is_published = False
+            product.save()
+            return redirect("catalog:product_detail", pk=pk)  # Возвращаем на страницу товара
+
+        # 3. Если права нет — выкидываем ошибку доступа
+        raise PermissionDenied
+
+
+class CategoryProductsListView(ListView):
+    model = Product
+    template_name = 'catalog/category_products.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        # Используем нашу сервисную функцию
+        return get_products_by_category(self.kwargs['category_id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = Category.objects.get(pk=self.kwargs['category_id'])
+        return context
 
